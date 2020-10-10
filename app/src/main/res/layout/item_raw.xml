@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/entry_mood_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:adjustViewBounds="true"
+        android:layout_marginLeft="10dp"
+        tools:srcCompat = "@drawable/ic_outline_tag_faces_24"
+        android:contentDescription="@string/Mood"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/entry_date"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/entry_mood"
+        />
+
+    <TextView
+        android:id="@+id/entry_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        tools:text = "12 MAY"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintStart_toEndOf="@id/entry_mood_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/entry_mood"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        tools:text="GOOD"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintStart_toEndOf="@id/entry_mood_icon"
+        app:layout_constraintTop_toBottomOf="@id/entry_date"
+        app:layout_constraintEnd_toStartOf="@id/entry_time"
+        app:layout_constraintBottom_toTopOf="@id/entry_overview"
+        />
+
+    <TextView
+        android:id="@+id/entry_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text = "12:30PM"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintStart_toEndOf="@id/entry_mood"
+        app:layout_constraintBottom_toBottomOf="@id/entry_mood"
+        />
+
+    <TextView
+        android:id="@+id/entry_overview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text = "A small paragraph"
+        app:layout_constraintStart_toStartOf="@id/entry_mood"
+        app:layout_constraintTop_toBottomOf="@id/entry_mood"
+        />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

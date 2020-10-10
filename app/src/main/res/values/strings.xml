@@ -1,0 +1,10 @@
+<resources>
+    <string name= "app_name">Life Journey</string>
+    <string name= "entries">Entries</string>
+    <string name= "calendar">Calendar</string>
+    <string name= "Mood">Mood</string>
+    <string name= "fab_content_desc">New Entry</string>
+    <string name= "search">Search</string>
+    <string name= "tick">Tick</string>
+    <string name= "discard">Discard</string>
+</resources>
