@@ -5,28 +5,32 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CalendarView
+import android.widget.TextView
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.lifecycle.Observer
+import java.util.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [CalendarFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class CalendarFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
+    private lateinit var journalRecyclerView : RecyclerView
+    private lateinit var calendarView : CalendarView
+    private lateinit var noEntryView : TextView
+    private var adapter = TheAdapter(emptyList())
+    private var chosenDay: Int = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+    private var chosenMonth: Int = Calendar.getInstance().get(Calendar.MONTH)
+    private var chosenYear: Int = Calendar.getInstance().get(Calendar.YEAR)
+
+
+    private val journalListViewModel: JournalListViewModel by lazy {
+        ViewModelProviders.of(this).get(JournalListViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+
     }
 
     override fun onCreateView(
@@ -34,26 +38,51 @@ class CalendarFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_calendar, container, false)
+        val view =  inflater.inflate(R.layout.fragment_calendar, container, false)
+        journalRecyclerView = view.findViewById(R.id.entries_list)
+        calendarView = view.findViewById(R.id.calendar_view)
+        noEntryView = view.findViewById(R.id.no_entry)
+        
+        journalRecyclerView.layoutManager = LinearLayoutManager(context)
+        journalRecyclerView.adapter = adapter
+        
+        calendarView.setOnDateChangeListener { calendarView, year, month, day ->
+            chosenYear = year
+            chosenMonth = month
+            chosenDay = day
+            updateJournalsList()
+        }
+        return view
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment CalendarFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            CalendarFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    private fun updateUI(journals: List<Journal>) {
+        adapter = TheAdapter(journals)
+
+        if (adapter.itemCount == 0)
+        {
+            noEntryView.visibility = View.VISIBLE
+        }
+        else
+        {
+            noEntryView.visibility = View.INVISIBLE
+        }
+
+        journalRecyclerView.adapter = adapter
     }
+
+    private fun updateJournalsList() {
+        journalListViewModel.getAllJournalsByDate(chosenYear,chosenMonth, chosenDay).observe(
+            viewLifecycleOwner,
+            Observer { journals ->
+                journals?.let {
+                    updateUI(journals)
+                }
+            })
+    }
+
+    override fun onStart() {
+        super.onStart()
+        updateJournalsList()
+    }
+
 }

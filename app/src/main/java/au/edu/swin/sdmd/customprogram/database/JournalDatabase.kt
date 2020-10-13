@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import au.edu.swin.sdmd.customprogram.Journal
 
-@Database (entities = [Journal::class], version = 1)
+@Database (entities = [Journal::class], version = 1, exportSchema = false)
 @TypeConverters (JournalTypeConverters::class)
 abstract class JournalDatabase : RoomDatabase() {
 
