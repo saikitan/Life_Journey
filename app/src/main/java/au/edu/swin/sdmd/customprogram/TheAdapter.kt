@@ -12,7 +12,9 @@ import androidx.recyclerview.widget.RecyclerView
 import java.text.DateFormat
 import java.util.*
 
-class TheAdapter(private val data: List<Journal>) : RecyclerView.Adapter<TheAdapter.TheHolder>() {
+class TheAdapter(private val data: List<Journal>,
+                 private val listener: (Journal) -> Unit) : RecyclerView.Adapter<TheAdapter.TheHolder>() {
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TheHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -73,14 +75,12 @@ class TheAdapter(private val data: List<Journal>) : RecyclerView.Adapter<TheAdap
 
             vEntryMoodText.text = moodText
 
-            vEntryDate.text = DateFormat.getDateInstance(DateFormat.SHORT, Locale.UK).format(item.journalDate)
+            vEntryDate.text = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.UK).format(item.journalDate).toUpperCase()
             vEntryTime.text = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.UK).format(item.journalDate)
 
             vEntryOverview.text = item.journalData
-
+            v.setOnClickListener { listener (item) }
 
         }
-
-
     }
 }

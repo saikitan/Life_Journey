@@ -18,7 +18,7 @@ class CalendarFragment : Fragment() {
     private lateinit var journalRecyclerView : RecyclerView
     private lateinit var calendarView : CalendarView
     private lateinit var noEntryView : TextView
-    private var adapter = TheAdapter(emptyList())
+    private var adapter = TheAdapter(emptyList()) {showDetails(it)}
     private var chosenDay: Int = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
     private var chosenMonth: Int = Calendar.getInstance().get(Calendar.MONTH)
     private var chosenYear: Int = Calendar.getInstance().get(Calendar.YEAR)
@@ -46,7 +46,7 @@ class CalendarFragment : Fragment() {
         journalRecyclerView.layoutManager = LinearLayoutManager(context)
         journalRecyclerView.adapter = adapter
         
-        calendarView.setOnDateChangeListener { calendarView, year, month, day ->
+        calendarView.setOnDateChangeListener { _, year, month, day ->
             chosenYear = year
             chosenMonth = month
             chosenDay = day
@@ -56,7 +56,7 @@ class CalendarFragment : Fragment() {
     }
 
     private fun updateUI(journals: List<Journal>) {
-        adapter = TheAdapter(journals)
+        adapter = TheAdapter(journals) {showDetails(it)}
 
         if (adapter.itemCount == 0)
         {
@@ -83,6 +83,12 @@ class CalendarFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         updateJournalsList()
+    }
+
+    private fun showDetails(item : Journal)
+    {
+        val intent = EntryDetailsActivity.newIntent(activity, item)
+        startActivity(intent)
     }
 
 }

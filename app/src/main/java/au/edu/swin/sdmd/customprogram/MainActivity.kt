@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         vNewEntry.setOnClickListener {
-            val intent = Intent (this, NewEntryActivity::class.java)
+            val intent = EntryInputActivity.newIntent(this, Journal(), false)
             startActivity(intent)
         }
 

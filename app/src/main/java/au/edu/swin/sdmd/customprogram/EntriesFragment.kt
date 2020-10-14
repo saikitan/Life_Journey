@@ -16,7 +16,7 @@ class EntriesFragment : Fragment() {
 
     private lateinit var journalRecyclerView: RecyclerView
     private lateinit var noEntryView : TextView
-    private var adapter = TheAdapter(emptyList())
+    private var adapter = TheAdapter(emptyList()) {showDetails(it)}
 
     private val journalListViewModel: JournalListViewModel by lazy {
         ViewModelProviders.of(this).get(JournalListViewModel::class.java)
@@ -41,7 +41,7 @@ class EntriesFragment : Fragment() {
     }
 
     private fun updateUI(journals: List<Journal>) {
-        adapter = TheAdapter(journals)
+        adapter = TheAdapter(journals) {showDetails(it)}
 
         if (adapter.itemCount == 0)
         {
@@ -68,4 +68,9 @@ class EntriesFragment : Fragment() {
 
     }
 
+    private fun showDetails(item : Journal)
+    {
+        val intent = EntryDetailsActivity.newIntent(activity, item)
+        startActivity(intent)
+    }
 }

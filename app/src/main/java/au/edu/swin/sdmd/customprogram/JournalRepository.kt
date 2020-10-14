@@ -47,6 +47,12 @@ class JournalRepository private constructor(context: Context){
         }
     }
 
+    fun deleteJournal(journal: Journal) {
+        executor.execute {
+            journalDao.deleteJournal(journal)
+        }
+    }
+
     companion object {
         private var INSTANCE: JournalRepository? = null
 

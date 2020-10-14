@@ -8,13 +8,13 @@ import java.util.*
 @Dao
 interface JournalDao {
 
-    @Query("SELECT * From journal_table ORDER BY journalDate DESC")
+    @Query("SELECT * From journalTable ORDER BY journalDate DESC")
     fun getJournals() : LiveData<List<Journal>>
 
-    @Query("SELECT * From journal_table WHERE journalDate BETWEEN (:start) AND (:end)  ORDER BY journalDate DESC")
+    @Query("SELECT * From journalTable WHERE journalDate BETWEEN (:start) AND (:end)  ORDER BY journalDate DESC")
     fun getJournalsByDate(start : Long, end: Long) : LiveData<List<Journal>>
 
-    @Query("SELECT * FROM journal_table WHERE id=(:id)")
+    @Query("SELECT * FROM journalTable WHERE id=(:id)")
     fun getJournal(id: UUID): LiveData<Journal?>
 
     @Insert
@@ -22,6 +22,9 @@ interface JournalDao {
 
     @Update
     fun updateJournal(journal: Journal)
+
+    @Delete
+    fun deleteJournal(journal: Journal)
 
 
 }
