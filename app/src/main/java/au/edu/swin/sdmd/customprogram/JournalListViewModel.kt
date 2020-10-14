@@ -17,4 +17,9 @@ class JournalListViewModel : ViewModel() {
         journalListLiveData = journalRepository.getJournalsByDate(year, month, day)
         return journalListLiveData
     }
+
+    fun getAllJournalsByMonth(year : Int, month : Int) : LiveData<List<Journal>> {
+        journalListLiveData = journalRepository.getJournalsByMonth(year, month)
+        return journalListLiveData
+    }
 }

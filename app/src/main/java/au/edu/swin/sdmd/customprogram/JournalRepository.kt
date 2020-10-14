@@ -1,10 +1,12 @@
 package au.edu.swin.sdmd.customprogram
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.room.Room
 import au.edu.swin.sdmd.customprogram.database.JournalDatabase
 import java.lang.IllegalStateException
+import java.time.YearMonth
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -31,6 +33,15 @@ class JournalRepository private constructor(context: Context){
         calendarInstance.set(year, month, day, 0, 0,0)
         val start = calendarInstance.timeInMillis
         calendarInstance.set(year, month, day, 23, 59,59)
+        val end  = calendarInstance.timeInMillis
+        return journalDao.getJournalsByDate(start, end)
+    }
+
+    fun getJournalsByMonth(year: Int, month : Int) : LiveData<List<Journal>> {
+        val calendarInstance = Calendar.getInstance()
+        calendarInstance.set(year, month, 1, 0, 0,0)
+        val start = calendarInstance.timeInMillis
+        calendarInstance.set(year, month, calendarInstance.getActualMaximum(Calendar.DAY_OF_MONTH) , 23, 59,59)
         val end  = calendarInstance.timeInMillis
         return journalDao.getJournalsByDate(start, end)
     }

@@ -11,11 +11,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class EntriesFragment : Fragment() {
 
     private lateinit var journalRecyclerView: RecyclerView
     private lateinit var noEntryView : TextView
+    private lateinit var vNewEntry : FloatingActionButton
     private var adapter = TheAdapter(emptyList()) {showDetails(it)}
 
     private val journalListViewModel: JournalListViewModel by lazy {
@@ -35,8 +37,16 @@ class EntriesFragment : Fragment() {
         val view =  inflater.inflate(R.layout.fragment_entries, container, false)
         journalRecyclerView = view.findViewById(R.id.entries_list)
         noEntryView = view.findViewById(R.id.no_entry)
+        vNewEntry = view.findViewById(R.id.new_entry)
+
         journalRecyclerView.layoutManager = LinearLayoutManager(context)
         journalRecyclerView.adapter = adapter
+
+        vNewEntry.setOnClickListener {
+            val intent = EntryInputActivity.newIntent(activity?.applicationContext, Journal(), false)
+            startActivity(intent)
+        }
+
         return view
     }
 

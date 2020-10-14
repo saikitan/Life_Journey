@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import androidx.fragment.app.FragmentActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.DateFormat
 import java.util.*
@@ -207,7 +208,7 @@ class EntryInputActivity : AppCompatActivity() {
     }
 
     companion object{
-        fun newIntent(context: Context, journal: Journal, editJournal: Boolean): Intent {
+        fun newIntent(context: Context?, journal: Journal, editJournal: Boolean): Intent {
             return Intent(context, EntryInputActivity::class.java).apply {
                 putExtra(JOURNAL_KEY, journal)
                 putExtra(EDIT_KEY, editJournal)

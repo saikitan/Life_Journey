@@ -16,7 +16,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var vBottomNavigation : BottomNavigationView
     private lateinit var appBar : Toolbar
-    private lateinit var vNewEntry : FloatingActionButton
+    private lateinit var entriesFragment: EntriesFragment
+    private lateinit var calendarFragment: CalendarFragment
+    private lateinit var moodFragment: MoodFragment
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,17 +27,18 @@ class MainActivity : AppCompatActivity() {
 
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
         appBar = findViewById(R.id.app_bar)
-        vNewEntry = findViewById(R.id.new_entry)
 
         setSupportActionBar(appBar)
 
+        entriesFragment = EntriesFragment()
+        calendarFragment = CalendarFragment()
+        moodFragment = MoodFragment()
 
         if (currentFragment == null)
         {
-            val fragment = EntriesFragment()
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.fragment_container, fragment)
+                .replace(R.id.fragment_container, entriesFragment)
                 .commit()
         }
 
@@ -43,20 +47,18 @@ class MainActivity : AppCompatActivity() {
         vBottomNavigation.setOnNavigationItemSelectedListener {
             lateinit var fragment : Fragment
 
+
             when(it.itemId) {
                 R.id.entries_view -> {
                     // Respond to navigation item 1 click
-                    fragment = EntriesFragment()
-                    Log.d("MainActivity", "Entries clicked")
+                    fragment = entriesFragment
                 }
                 R.id.calendar_view -> {
                     // Respond to navigation item 2 click
-                    fragment = CalendarFragment()
-                    Log.d("MainActivity", "Calendar clicked")
+                    fragment = calendarFragment
                 }
                 R.id.mood_view -> {
-                    fragment = MoodFragment()
-                    Log.d("MainActivity", "Mood clicked")
+                    fragment = moodFragment
                 }
             }
 
@@ -69,10 +71,7 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        vNewEntry.setOnClickListener {
-            val intent = EntryInputActivity.newIntent(this, Journal(), false)
-            startActivity(intent)
-        }
+
 
     }
 

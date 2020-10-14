@@ -23,6 +23,23 @@
         app:layout_constraintEnd_toEndOf="@id/entries_list"
         app:layout_constraintBottom_toBottomOf="@id/entries_list"/>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintTop_toBottomOf="@id/calendar_view"
+        app:layout_constraintBottom_toTopOf="@id/entries_list"/>
+
+    <include
+        layout="@layout/layout_fab_newentry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        app:layout_constraintVertical_bias="0.6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/calendar_view"
+        app:layout_constraintBottom_toTopOf="@id/entries_list"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/entries_list"
         android:layout_width="match_parent"

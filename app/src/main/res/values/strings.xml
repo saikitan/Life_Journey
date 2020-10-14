@@ -7,6 +7,8 @@
     <string name="search">Search</string>
     <string name="back">Back</string>
     <string name="delete">Delete</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
     <string name="tick">Tick</string>
     <string name="discard">Discard</string>
     <string name="discard_title">Discard changes?</string>
@@ -25,4 +27,5 @@
     <string name="entry_hint">Write here...</string>
     <string name="no_entry">No Entry Found!</string>
     <string name= "empty_input_error">Enter some text!</string>
+    <string name= "month_mood">Mood of the Month:</string>
 </resources>

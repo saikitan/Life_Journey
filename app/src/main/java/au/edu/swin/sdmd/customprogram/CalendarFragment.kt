@@ -1,6 +1,7 @@
 package au.edu.swin.sdmd.customprogram
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.Observer
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
 
 class CalendarFragment : Fragment() {
@@ -18,6 +20,7 @@ class CalendarFragment : Fragment() {
     private lateinit var journalRecyclerView : RecyclerView
     private lateinit var calendarView : CalendarView
     private lateinit var noEntryView : TextView
+    private lateinit var vNewEntry : FloatingActionButton
     private var adapter = TheAdapter(emptyList()) {showDetails(it)}
     private var chosenDay: Int = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
     private var chosenMonth: Int = Calendar.getInstance().get(Calendar.MONTH)
@@ -42,7 +45,8 @@ class CalendarFragment : Fragment() {
         journalRecyclerView = view.findViewById(R.id.entries_list)
         calendarView = view.findViewById(R.id.calendar_view)
         noEntryView = view.findViewById(R.id.no_entry)
-        
+        vNewEntry = view.findViewById(R.id.new_entry)
+
         journalRecyclerView.layoutManager = LinearLayoutManager(context)
         journalRecyclerView.adapter = adapter
         
@@ -52,6 +56,12 @@ class CalendarFragment : Fragment() {
             chosenDay = day
             updateJournalsList()
         }
+
+        vNewEntry.setOnClickListener {
+            val intent = EntryInputActivity.newIntent(activity?.applicationContext, Journal(), false)
+            startActivity(intent)
+        }
+
         return view
     }
 
