@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.room.Room
 import au.edu.swin.sdmd.customprogram.database.JournalDatabase
+import java.io.File
 import java.lang.IllegalStateException
 import java.time.YearMonth
 import java.util.*
@@ -23,6 +24,7 @@ class JournalRepository private constructor(context: Context){
 
     private val journalDao = database.journalDao()
     private val executor = Executors.newSingleThreadExecutor()
+    private val filesDir = context.applicationContext.filesDir
 
     fun getJournals() : LiveData<List<Journal>> = journalDao.getJournals()
 
@@ -63,6 +65,8 @@ class JournalRepository private constructor(context: Context){
             journalDao.deleteJournal(journal)
         }
     }
+
+    fun getPhotoFile(journal: Journal) : File = File(filesDir, journal.photoFileName)
 
     companion object {
         private var INSTANCE: JournalRepository? = null

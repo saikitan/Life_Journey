@@ -11,4 +11,8 @@ import java.util.*
 data class Journal(@PrimaryKey val id: UUID = UUID.randomUUID(),
                    var journalData : String = "",
                    var journalDate: Date = Calendar.getInstance().time,
-                   var journalMood: Int = 3) : Parcelable
+                   var journalMood: Int = 3) : Parcelable {
+
+    val photoFileName
+        get() = "IMG_$id.jpg"
+}

@@ -70,7 +70,7 @@ class EntriesFragment : Fragment() {
         super.onStart()
         journalListViewModel.getAllJournals().observe(
             viewLifecycleOwner,
-            Observer { journals ->
+            { journals ->
                 journals?.let {
                     updateUI(journals)
                 }
@@ -80,7 +80,7 @@ class EntriesFragment : Fragment() {
 
     private fun showDetails(item : Journal)
     {
-        val intent = EntryDetailsActivity.newIntent(activity, item)
+        val intent = EntryDetailsActivity.newIntent(activity, item.id.toString())
         startActivity(intent)
     }
 }

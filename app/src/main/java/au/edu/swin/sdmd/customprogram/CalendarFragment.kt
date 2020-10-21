@@ -97,7 +97,7 @@ class CalendarFragment : Fragment() {
 
     private fun showDetails(item : Journal)
     {
-        val intent = EntryDetailsActivity.newIntent(activity, item)
+        val intent = EntryDetailsActivity.newIntent(activity, item.id.toString())
         startActivity(intent)
     }
 

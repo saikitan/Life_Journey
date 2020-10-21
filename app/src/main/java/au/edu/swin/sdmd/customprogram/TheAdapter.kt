@@ -1,6 +1,5 @@
 package au.edu.swin.sdmd.customprogram
 
-import android.graphics.Color
 import android.graphics.Color.argb
 import android.view.LayoutInflater
 import android.view.View
@@ -77,6 +76,7 @@ class TheAdapter(private val data: List<Journal>,
 
             vEntryDate.text = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.UK).format(item.journalDate).toUpperCase()
             vEntryTime.text = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.UK).format(item.journalDate)
+
 
             vEntryOverview.text = item.journalData
             v.setOnClickListener { listener (item) }

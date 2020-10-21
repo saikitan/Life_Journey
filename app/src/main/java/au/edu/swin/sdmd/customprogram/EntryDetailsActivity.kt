@@ -11,7 +11,9 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.io.File
 import java.text.DateFormat
 import java.util.*
 
@@ -28,13 +30,17 @@ class EntryDetailsActivity : AppCompatActivity() {
     private lateinit var vEntryMoodText : TextView
     private lateinit var vEntryMoodIcon : ImageView
     private lateinit var vEntryContentText : TextView
+    private lateinit var vJournalImage : ImageView
+    private lateinit var journalImage : File
     private lateinit var journal: Journal
+
+    private val journalDetailsViewModel: JournalDetailsViewModel by lazy {
+        ViewModelProviders.of(this).get(JournalDetailsViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry_details)
-
-        journal = intent.getParcelableExtra(JOURNAL_KEY)
 
         vBackButton = findViewById(R.id.back_button)
         vEditButton = findViewById(R.id.edit_button)
@@ -44,8 +50,9 @@ class EntryDetailsActivity : AppCompatActivity() {
         vEntryMoodText = findViewById(R.id.entry_mood_text)
         vEntryMoodIcon = findViewById(R.id.entry_mood_icon)
         vEntryContentText = findViewById(R.id.entry_content)
+        vJournalImage = findViewById(R.id.journal_image)
 
-        updateUI()
+        updateJournal()
 
         vEntryContentText.movementMethod = ScrollingMovementMethod()
 
@@ -74,13 +81,11 @@ class EntryDetailsActivity : AppCompatActivity() {
 
             if (journalReturn != null)
             {
-                journal = journalReturn
+                updateJournal()
             }
             else {
                 finish()
             }
-
-            updateUI()
         }
 
     }
@@ -93,23 +98,23 @@ class EntryDetailsActivity : AppCompatActivity() {
         {
             1 -> {
                 vEntryMoodText.text = getString(R.string.very_bad_mood)
-                vEntryMoodIcon.setImageDrawable(getDrawable(R.drawable.ic_very_bad_mood_24))
+                vEntryMoodIcon.setImageResource(R.drawable.ic_very_bad_mood_24)
             }
             2 -> {
                 vEntryMoodText.text = getString(R.string.bad_mood)
-                vEntryMoodIcon.setImageDrawable(getDrawable(R.drawable.ic_bad_mood_24))
+                vEntryMoodIcon.setImageResource(R.drawable.ic_bad_mood_24)
             }
             4 -> {
                 vEntryMoodText.text = getString(R.string.good_mood)
-                vEntryMoodIcon.setImageDrawable(getDrawable(R.drawable.ic_good_mood_24))
+                vEntryMoodIcon.setImageResource(R.drawable.ic_good_mood_24)
             }
             5 -> {
                 vEntryMoodText.text = getString(R.string.very_good_mood)
-                vEntryMoodIcon.setImageDrawable(getDrawable(R.drawable.ic_very_good_mood_24))
+                vEntryMoodIcon.setImageResource(R.drawable.ic_very_good_mood_24)
             }
             else -> {
                 vEntryMoodText.text = getString(R.string.neutral_mood)
-                vEntryMoodIcon.setImageDrawable(getDrawable(R.drawable.ic_neutral_mood_24))
+                vEntryMoodIcon.setImageResource(R.drawable.ic_neutral_mood_24)
             }
         }
 
@@ -120,6 +125,14 @@ class EntryDetailsActivity : AppCompatActivity() {
         }
 
         vEntryContentText.text = journal.journalData
+
+        if (journalImage.exists()) {
+            val bitmap = getScaledBitmap(journalImage.path, this)
+            vJournalImage.setImageBitmap(bitmap)
+        }
+        else {
+            vJournalImage.setImageDrawable(null)
+        }
     }
 
 
@@ -131,16 +144,36 @@ class EntryDetailsActivity : AppCompatActivity() {
                 }
                 .setPositiveButton(resources.getString(R.string.delete)) { _, _ ->
                     JournalRepository.get().deleteJournal(journal)
+                    journalImage.delete()
                     finish()
                 }
                 .show()
 
     }
 
+    private fun updateJournal()
+    {
+        journalDetailsViewModel.loadJournal(UUID.fromString(intent.getStringExtra(JOURNAL_KEY))).observe(
+            this,
+            { journalFound ->
+                journalFound?.let {
+                    journal = journalFound
+                    journalImage = JournalRepository.get().getPhotoFile(journal)
+                    updateUI()
+                }
+            }
+        )
+    }
+
+    override fun onStart() {
+        super.onStart()
+        updateJournal()
+    }
+
     companion object{
-        fun newIntent(fragmentActivity: FragmentActivity?, journal: Parcelable): Intent {
+        fun newIntent(fragmentActivity: FragmentActivity?, journalId: String): Intent {
             return Intent(fragmentActivity, EntryDetailsActivity::class.java).apply {
-                putExtra(JOURNAL_KEY, journal)
+                putExtra(JOURNAL_KEY, journalId)
             }
         }
     }

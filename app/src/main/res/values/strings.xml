@@ -15,6 +15,7 @@
     <string name="discard_supporting_text">All unsaved changes will be lost.</string>
     <string name="delete_title">Delete?</string>
     <string name="delete_supporting_text">This entry will be permanently deleted.</string>
+    <string name="delete_image_supporting_text">This image will be permanently deleted.</string>
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
     <string name="very_good_mood_wrap">VERY\nGOOD</string>
@@ -26,6 +27,8 @@
     <string name="very_bad_mood_wrap">VERY\nBAD</string>
     <string name="entry_hint">Write here...</string>
     <string name="no_entry">No Entry Found!</string>
-    <string name= "empty_input_error">Enter some text!</string>
-    <string name= "month_mood">Mood of the Month:</string>
+    <string name="empty_input_error">Enter some text!</string>
+    <string name="month_mood">Mood of the Month:</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
 </resources>

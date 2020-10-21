@@ -5,18 +5,27 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
+import androidx.core.content.FileProvider
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.io.File
 import java.text.DateFormat
 import java.util.*
 
-private const val EDIT_KEY = "au.edu.swin.sdmd.customprogram.editjournal"
+const val EDIT_KEY = "au.edu.swin.sdmd.customprogram.editjournal"
+const val VIEW_PHOTO = 0
+private const val REQUEST_PHOTO = 1
 
 class EntryInputActivity : AppCompatActivity() {
 
@@ -27,9 +36,13 @@ class EntryInputActivity : AppCompatActivity() {
     private lateinit var vEntryTimeButton : Button
     private lateinit var vEntryMoodButton : Button
     private lateinit var vEntryContentInput : EditText
+    private lateinit var vCameraButton: ImageButton
+    private lateinit var vJournalImage: ImageView
     private lateinit var journalEntry : Journal
     private lateinit var formattedDate : String
     private lateinit var formattedTime: String
+    private lateinit var journalImage : File
+    private lateinit var photoUri : Uri
     private var editJournal = false
     private val calendarInstance = Calendar.getInstance()
 
@@ -47,17 +60,52 @@ class EntryInputActivity : AppCompatActivity() {
         vEntryTimeButton = findViewById(R.id.time_input)
         vEntryMoodButton = findViewById(R.id.mood_input)
         vEntryContentInput = findViewById(R.id.content_input)
+        vCameraButton = findViewById(R.id.camera_button)
+        vJournalImage = findViewById(R.id.image)
+
+        journalImage = JournalRepository.get().getPhotoFile(journalEntry)
+        photoUri = FileProvider.getUriForFile(this, "au.edu.swin.sdmd.customprogram.fileprovider", journalImage)
 
         calendarInstance.timeInMillis = journalEntry.journalDate.time
 
         updateDateTimeUI()
         updateMoodUI()
+        updateJournalImage()
 
         vEntryContentInput.setText(journalEntry.journalData)
 
         if (editJournal) {
             vDeleteButton.visibility = View.VISIBLE
         }
+
+        vCameraButton.apply {
+            val packageManager: PackageManager = this@EntryInputActivity.packageManager
+
+            val captureImage = Intent (MediaStore.ACTION_IMAGE_CAPTURE)
+            val resolvedActivity : ResolveInfo? = packageManager.resolveActivity(captureImage, PackageManager.MATCH_DEFAULT_ONLY)
+            if (resolvedActivity == null)
+            {
+                isEnabled = false
+            }
+
+            setOnClickListener {
+                captureImage.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+
+                val cameraActivity : List<ResolveInfo> = packageManager.queryIntentActivities(captureImage, PackageManager.MATCH_DEFAULT_ONLY)
+
+                for (activity in cameraActivity) {
+                    this@EntryInputActivity.grantUriPermission(activity.activityInfo.packageName, photoUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+
+                    startActivityForResult(captureImage, REQUEST_PHOTO)
+                }
+            }
+        }
+
+        vJournalImage.setOnClickListener {
+            val i = PhotoDetailsActivity.newIntent(this, journalEntry, true)
+            startActivityForResult(i, VIEW_PHOTO)
+        }
+
 
         vEntryDateButton.setOnClickListener {
             DatePickerDialog(this,
@@ -145,6 +193,32 @@ class EntryInputActivity : AppCompatActivity() {
         vEntryTimeButton.text = formattedTime
     }
 
+    private fun updateJournalImage() {
+        if (journalImage.exists()) {
+            val bitmap = getScaledBitmap(journalImage.path, this)
+            vJournalImage.setImageBitmap(bitmap)
+        }
+        else {
+            vJournalImage.setImageDrawable(null)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode != Activity.RESULT_OK) return
+
+        when (requestCode)
+        {
+            REQUEST_PHOTO -> {
+                this.revokeUriPermission(photoUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            }
+        }
+
+        updateJournalImage()
+
+    }
+
     private fun showMoodSelectionDialog() {
         val items = arrayOf(getString(R.string.very_good_mood),
             getString(R.string.good_mood),
@@ -170,7 +244,7 @@ class EntryInputActivity : AppCompatActivity() {
     }
 
     private fun showDiscardAlert (){
-        if (vEntryContentInput.text.isEmpty())
+        if (vEntryContentInput.text.isEmpty() && !editJournal && !journalImage.exists())
         {
             finish()
         }
@@ -181,6 +255,12 @@ class EntryInputActivity : AppCompatActivity() {
                 .setNeutralButton(resources.getString(R.string.cancel)) { _, _ ->
                 }
                 .setPositiveButton(resources.getString(R.string.discard)) { _, _ ->
+
+                    if (!editJournal && journalImage.exists())
+                    {
+                        journalImage.delete()
+                    }
+
                     finish()
                 }
                 .show()
@@ -196,6 +276,7 @@ class EntryInputActivity : AppCompatActivity() {
             }
             .setPositiveButton(resources.getString(R.string.delete)) { _, _ ->
                 JournalRepository.get().deleteJournal(journalEntry)
+                journalImage.delete()
                 setResult(Activity.RESULT_OK)
                 finish()
             }
@@ -205,6 +286,11 @@ class EntryInputActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         showDiscardAlert()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        this.revokeUriPermission(photoUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
     }
 
     companion object{

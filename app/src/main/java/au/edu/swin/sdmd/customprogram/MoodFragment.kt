@@ -34,7 +34,7 @@ class MoodFragment : Fragment() {
     private var currentYear = Calendar.getInstance().get(Calendar.YEAR)
     private var currentMonth = Calendar.getInstance().get(Calendar.MONTH)
     private val monthName = arrayOf("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
-    private val dataColorArray = mutableListOf(Color.BLUE, Color.CYAN, Color.GREEN, Color.MAGENTA, Color.RED)
+    private val dataColorArray = mutableListOf(Color.argb(255, 202, 77, 63), Color.argb(255, 95, 151, 215), Color.argb(255, 229, 194, 50), Color.argb(255, 121, 203, 118), Color.RED)
 
     private val journalListViewModel: JournalListViewModel by lazy {
         ViewModelProviders.of(this).get(JournalListViewModel::class.java)
@@ -61,7 +61,7 @@ class MoodFragment : Fragment() {
         vMoodChart.legend.isEnabled = false
         vMoodChart.description.isEnabled = false
 
-        vMoodChart.setUsePercentValues(true)
+        //vMoodChart.setUsePercentValues(true)
         vMoodChart.setNoDataText("")
         vMoodChart.holeRadius = 0f
         vMoodChart.transparentCircleRadius= 0f
@@ -114,9 +114,9 @@ class MoodFragment : Fragment() {
         val monthText = "${monthName[currentMonth]} $currentYear"
         val moodFrequency = arrayOf(0,0,0,0,0)
         val entries : ArrayList<PieEntry> = ArrayList()
-        var dataSet = PieDataSet(entries, "Mood")
-        var pieData = PieData(dataSet)
-        var maxIndex: Int
+        val dataSet = PieDataSet(entries, "Mood")
+        val pieData = PieData(dataSet)
+        val maxIndex: Int
 
         vMonthText.text = monthText
 
@@ -154,7 +154,7 @@ class MoodFragment : Fragment() {
             }
 
             dataSet.colors = dataColorArray
-            pieData.setValueTextSize(20f)
+            pieData.setValueTextSize(12f)
             pieData.setValueTextColor(Color.WHITE)
 
             vMoodChart.data = pieData
@@ -166,11 +166,11 @@ class MoodFragment : Fragment() {
 
             when (maxIndex)
             {
-                0 -> vMoodIcon.setImageDrawable(activity?.resources?.getDrawable(R.drawable.ic_very_good_mood_24, null))
-                1-> vMoodIcon.setImageDrawable(activity?.resources?.getDrawable(R.drawable.ic_good_mood_24, null))
-                3 -> vMoodIcon.setImageDrawable(activity?.resources?.getDrawable(R.drawable.ic_bad_mood_24, null))
-                4 -> vMoodIcon.setImageDrawable(activity?.resources?.getDrawable(R.drawable.ic_very_bad_mood_24, null))
-                else -> vMoodIcon.setImageDrawable(activity?.resources?.getDrawable(R.drawable.ic_neutral_mood_24, null))
+                0 -> vMoodIcon.setImageResource(R.drawable.ic_very_good_mood_24)
+                1-> vMoodIcon.setImageResource(R.drawable.ic_good_mood_24)
+                3 -> vMoodIcon.setImageResource(R.drawable.ic_bad_mood_24)
+                4 -> vMoodIcon.setImageResource(R.drawable.ic_very_bad_mood_24)
+                else -> vMoodIcon.setImageResource(R.drawable.ic_neutral_mood_24)
             }
 
             when (maxIndex)
