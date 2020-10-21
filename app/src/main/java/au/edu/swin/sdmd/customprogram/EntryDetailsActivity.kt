@@ -69,6 +69,11 @@ class EntryDetailsActivity : AppCompatActivity() {
             showDeleteAlert()
         }
 
+        vJournalImage.setOnClickListener {
+            val i = PhotoDetailsActivity.newIntent(this, journal, false)
+            startActivityForResult(i, VIEW_PHOTO)
+        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -85,6 +85,8 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.search -> {
                 Log.d("MainActivity", "Search clicked")
+                val i = Intent (this, SearchActivity::class.java)
+                startActivity(i)
                 true
             }
 

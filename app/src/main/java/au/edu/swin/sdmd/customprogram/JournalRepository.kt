@@ -48,6 +48,8 @@ class JournalRepository private constructor(context: Context){
         return journalDao.getJournalsByDate(start, end)
     }
 
+    fun getJournalsBySearch(searchString : String) : LiveData<List<Journal>> = journalDao.getJournalsBySearch("%${searchString}%")
+
     fun updateJournal (journal: Journal) {
         executor.execute {
             journalDao.updateJournal(journal)

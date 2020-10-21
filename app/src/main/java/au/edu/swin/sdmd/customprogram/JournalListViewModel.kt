@@ -14,4 +14,6 @@ class JournalListViewModel : ViewModel() {
 
     fun getAllJournalsByMonth(year : Int, month : Int) : LiveData<List<Journal>> = journalRepository.getJournalsByMonth(year, month)
 
+    fun getAllJournalBySearch(searchString : String) : LiveData<List<Journal>> = journalRepository.getJournalsBySearch(searchString)
+
 }

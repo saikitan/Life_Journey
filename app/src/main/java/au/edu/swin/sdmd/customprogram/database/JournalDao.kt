@@ -14,6 +14,9 @@ interface JournalDao {
     @Query("SELECT * From journalTable WHERE journalDate BETWEEN (:start) AND (:end)  ORDER BY journalDate DESC")
     fun getJournalsByDate(start : Long, end: Long) : LiveData<List<Journal>>
 
+    @Query("SELECT * From journalTable WHERE journalData LIKE (:searchString) ORDER BY journalDate DESC")
+    fun getJournalsBySearch(searchString: String) : LiveData<List<Journal>>
+
     @Query("SELECT * FROM journalTable WHERE id=(:id)")
     fun getJournal(id: UUID): LiveData<Journal?>
 
