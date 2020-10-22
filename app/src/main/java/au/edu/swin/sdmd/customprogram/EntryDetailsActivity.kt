@@ -5,13 +5,11 @@ import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Parcelable
 import android.text.method.ScrollingMovementMethod
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.File
 import java.text.DateFormat
@@ -25,37 +23,36 @@ class EntryDetailsActivity : AppCompatActivity() {
     private lateinit var vBackButton : ImageButton
     private lateinit var vEditButton : ImageButton
     private lateinit var vDeleteButton : ImageButton
-    private lateinit var vEntryDateText : TextView
-    private lateinit var vEntryTimeText : TextView
+    private lateinit var vEntryDate : TextView
+    private lateinit var vEntryTime : TextView
     private lateinit var vEntryMoodText : TextView
     private lateinit var vEntryMoodIcon : ImageView
-    private lateinit var vEntryContentText : TextView
-    private lateinit var vJournalImage : ImageView
+    private lateinit var vEntryContent : TextView
+    private lateinit var vEntryImage : ImageView
     private lateinit var journalImage : File
     private lateinit var journal: Journal
+    private val journalRepository = JournalRepository.get()
 
-    private val journalDetailsViewModel: JournalDetailsViewModel by lazy {
-        ViewModelProviders.of(this).get(JournalDetailsViewModel::class.java)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_entry_details)
 
+        // Initialize view
         vBackButton = findViewById(R.id.back_button)
         vEditButton = findViewById(R.id.edit_button)
         vDeleteButton = findViewById(R.id.delete_button)
-        vEntryDateText = findViewById(R.id.entry_date_text)
-        vEntryTimeText = findViewById(R.id.entry_time_text)
+        vEntryDate = findViewById(R.id.entry_date_text)
+        vEntryTime = findViewById(R.id.entry_time_text)
         vEntryMoodText = findViewById(R.id.entry_mood_text)
         vEntryMoodIcon = findViewById(R.id.entry_mood_icon)
-        vEntryContentText = findViewById(R.id.entry_content)
-        vJournalImage = findViewById(R.id.journal_image)
+        vEntryContent = findViewById(R.id.entry_content)
+        vEntryImage = findViewById(R.id.journal_image)
+        vEntryContent.movementMethod = ScrollingMovementMethod()
 
         updateJournal()
 
-        vEntryContentText.movementMethod = ScrollingMovementMethod()
-
+        // Setup listeners
         vBackButton.setOnClickListener {
             finish()
         }
@@ -69,7 +66,7 @@ class EntryDetailsActivity : AppCompatActivity() {
             showDeleteAlert()
         }
 
-        vJournalImage.setOnClickListener {
+        vEntryImage.setOnClickListener {
             val i = PhotoDetailsActivity.newIntent(this, journal, false)
             startActivityForResult(i, VIEW_PHOTO)
         }
@@ -84,7 +81,7 @@ class EntryDetailsActivity : AppCompatActivity() {
         if (requestCode == REQUEST_CODE) {
             val journalReturn = data?.getParcelableExtra<Journal>(JOURNAL_KEY)
 
-            if (journalReturn != null)
+            if (journalReturn != null) // Check whether journal is being deleted
             {
                 updateJournal()
             }
@@ -92,13 +89,17 @@ class EntryDetailsActivity : AppCompatActivity() {
                 finish()
             }
         }
-
     }
 
+    /*
+        This function will update all the UI Elements for the Journal (Date, Time, Mood, Content, Image)
+     */
     private fun updateUI() {
-        vEntryDateText.text = DateFormat.getDateInstance(DateFormat.LONG, Locale.UK).format(journal.journalDate)
-        vEntryTimeText.text = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.UK).format(journal.journalDate)
+        // Update Date and Time
+        vEntryDate.text = DateFormat.getDateInstance(DateFormat.LONG, Locale.UK).format(journal.journalDate)
+        vEntryTime.text = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.UK).format(journal.journalDate)
 
+        // Update Mood Icon and Text
         when (journal.journalMood)
         {
             1 -> {
@@ -129,18 +130,23 @@ class EntryDetailsActivity : AppCompatActivity() {
             else -> vEntryMoodText.setTextColor(Color.argb(255, 255, 165, 0))
         }
 
-        vEntryContentText.text = journal.journalData
+        // Update Journal Content
+        vEntryContent.text = journal.journalData
 
         if (journalImage.exists()) {
             val bitmap = getScaledBitmap(journalImage.path, this)
-            vJournalImage.setImageBitmap(bitmap)
+            vEntryImage.setImageBitmap(bitmap)
         }
         else {
-            vJournalImage.setImageDrawable(null)
+            vEntryImage.setImageDrawable(null)
         }
     }
 
 
+    /*
+        This function will create a delete confirmation dialog and perform action
+        according to the user response.
+     */
     private fun showDeleteAlert (){
             MaterialAlertDialogBuilder(this)
                 .setTitle(resources.getString(R.string.delete_title))
@@ -156,14 +162,17 @@ class EntryDetailsActivity : AppCompatActivity() {
 
     }
 
+    /*
+        This function will retrieve the latest info about the journal
+     */
     private fun updateJournal()
     {
-        journalDetailsViewModel.loadJournal(UUID.fromString(intent.getStringExtra(JOURNAL_KEY))).observe(
+        journalRepository.getJournal(UUID.fromString(intent.getStringExtra(JOURNAL_KEY))).observe(
             this,
             { journalFound ->
                 journalFound?.let {
                     journal = journalFound
-                    journalImage = JournalRepository.get().getPhotoFile(journal)
+                    journalImage = journalRepository.getPhotoFile(journal)
                     updateUI()
                 }
             }

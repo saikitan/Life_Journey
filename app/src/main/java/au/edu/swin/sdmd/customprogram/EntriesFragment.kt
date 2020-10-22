@@ -19,15 +19,8 @@ class EntriesFragment : Fragment() {
     private lateinit var noEntryView : TextView
     private lateinit var vNewEntry : FloatingActionButton
     private var adapter = TheAdapter(emptyList()) {showDetails(it)}
+    private val journalRepository = JournalRepository.get()
 
-    private val journalListViewModel: JournalListViewModel by lazy {
-        ViewModelProviders.of(this).get(JournalListViewModel::class.java)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,7 +61,7 @@ class EntriesFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        journalListViewModel.getAllJournals().observe(
+        journalRepository.getJournals().observe(
             viewLifecycleOwner,
             { journals ->
                 journals?.let {

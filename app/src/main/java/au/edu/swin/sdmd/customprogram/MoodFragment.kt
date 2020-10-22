@@ -1,6 +1,5 @@
 package au.edu.swin.sdmd.customprogram
 
-import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -11,8 +10,6 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.content.res.AppCompatResources.getDrawable
-import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.Observer
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.*
@@ -20,6 +17,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
 import kotlin.collections.ArrayList
 
+private const val KEY_YEAR = "au.edu.swin.sdmd.customprogram.year"
+private const val KEY_MONTH = "au.edu.swin.sdmd.customprogram.month"
 
 class MoodFragment : Fragment() {
 
@@ -31,14 +30,17 @@ class MoodFragment : Fragment() {
     private lateinit var vMonthMoodText : TextView
     private lateinit var vNoEntry : TextView
     private lateinit var vNewEntry : FloatingActionButton
-    private var currentYear = Calendar.getInstance().get(Calendar.YEAR)
-    private var currentMonth = Calendar.getInstance().get(Calendar.MONTH)
+    private var chosenYear = Calendar.getInstance().get(Calendar.YEAR)
+    private var chosenMonth = Calendar.getInstance().get(Calendar.MONTH)
+    private val journalRepository = JournalRepository.get()
     private val monthName = arrayOf("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
-    private val dataColorArray = mutableListOf(Color.argb(255, 202, 77, 63), Color.argb(255, 95, 151, 215), Color.argb(255, 229, 194, 50), Color.argb(255, 121, 203, 118), Color.RED)
+    private val dataColorArray = mutableListOf(
+        Color.argb(255, 119, 172, 223),
+        Color.argb(255, 204, 135, 90),
+        Color.argb(255, 125, 87, 221),
+        Color.argb(255, 189, 225, 97),
+        Color.argb(255, 198, 86, 170))
 
-    private val journalListViewModel: JournalListViewModel by lazy {
-        ViewModelProviders.of(this).get(JournalListViewModel::class.java)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,6 +49,7 @@ class MoodFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_mood, container, false)
 
+        // Initialize views
         vPreviousButton = view.findViewById(R.id.previous_button)
         vNextButton = view.findViewById(R.id.next_button)
         vMonthText = view.findViewById(R.id.month_text)
@@ -56,16 +59,22 @@ class MoodFragment : Fragment() {
         vNoEntry = view.findViewById(R.id.no_entry)
         vNewEntry = view.findViewById(R.id.new_entry)
 
+        if (savedInstanceState != null)
+        {
+            chosenYear = savedInstanceState.getInt(KEY_YEAR)
+            chosenMonth = savedInstanceState.getInt(KEY_MONTH)
+        }
+
         updateData()
 
+        // Setting up the chart characteristic
         vMoodChart.legend.isEnabled = false
         vMoodChart.description.isEnabled = false
-
-        //vMoodChart.setUsePercentValues(true)
         vMoodChart.setNoDataText("")
         vMoodChart.holeRadius = 0f
         vMoodChart.transparentCircleRadius= 0f
 
+        // Setup listeners
         vPreviousButton.setOnClickListener {
             previousMonth()
             updateData()
@@ -84,34 +93,40 @@ class MoodFragment : Fragment() {
         return view
     }
 
+    /*
+        This function will set the current month to the month before
+     */
     private fun previousMonth()
     {
-        if (currentMonth != 0)
+        if (chosenMonth != 0)
         {
-            currentMonth--
+            chosenMonth--
         }
         else
         {
-            currentMonth = 11
-            currentYear--
+            chosenMonth = 11
+            chosenYear--
         }
     }
 
+    /*
+        This function will set the current month to the month after
+     */
     private fun nextMonth()
     {
-        if (currentMonth != 11)
+        if (chosenMonth != 11)
         {
-            currentMonth++
+            chosenMonth++
         }
         else
         {
-            currentMonth = 0
-            currentYear++
+            chosenMonth = 0
+            chosenYear++
         }
     }
 
     private fun updateUI(journals: List<Journal>) {
-        val monthText = "${monthName[currentMonth]} $currentYear"
+        val monthText = "${monthName[chosenMonth]} $chosenYear"
         val moodFrequency = arrayOf(0,0,0,0,0)
         val entries : ArrayList<PieEntry> = ArrayList()
         val dataSet = PieDataSet(entries, "Mood")
@@ -192,8 +207,9 @@ class MoodFragment : Fragment() {
 
     }
 
+
     private fun updateData() {
-        journalListViewModel.getAllJournalsByMonth(currentYear, currentMonth).observe(
+        journalRepository.getJournalsByMonth(chosenYear, chosenMonth).observe(
             viewLifecycleOwner,
             Observer { journals ->
                 journals?.let {
@@ -202,10 +218,17 @@ class MoodFragment : Fragment() {
             })
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(KEY_YEAR, chosenYear)
+        outState.putInt(KEY_MONTH, chosenMonth)
+    }
+
     override fun onStart() {
         super.onStart()
         updateData()
-        Log.d("AAA", "Onstart")
+        Log.d("AAA", "Onstart $chosenMonth")
+
     }
 
 

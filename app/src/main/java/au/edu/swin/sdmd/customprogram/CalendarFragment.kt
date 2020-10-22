@@ -13,7 +13,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.lifecycle.Observer
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.android.synthetic.main.activity_entry_details.*
 import java.util.*
+
+private const val KEY_YEAR = "au.edu.swin.sdmd.customprogram.year"
+private const val KEY_MONTH = "au.edu.swin.sdmd.customprogram.month"
+private const val KEY_DAY = "au.edu.swin.sdmd.customprogram.day"
 
 class CalendarFragment : Fragment() {
 
@@ -22,19 +27,11 @@ class CalendarFragment : Fragment() {
     private lateinit var noEntryView : TextView
     private lateinit var vNewEntry : FloatingActionButton
     private var adapter = TheAdapter(emptyList()) {showDetails(it)}
-    private var chosenDay: Int = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
-    private var chosenMonth: Int = Calendar.getInstance().get(Calendar.MONTH)
-    private var chosenYear: Int = Calendar.getInstance().get(Calendar.YEAR)
-
-
-    private val journalListViewModel: JournalListViewModel by lazy {
-        ViewModelProviders.of(this).get(JournalListViewModel::class.java)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
+    private val calendarInstance = Calendar.getInstance()
+    private var chosenDay: Int = calendarInstance.get(Calendar.DAY_OF_MONTH)
+    private var chosenMonth: Int = calendarInstance.get(Calendar.MONTH)
+    private var chosenYear: Int = calendarInstance.get(Calendar.YEAR)
+    private val journalRepository = JournalRepository.get()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,6 +43,18 @@ class CalendarFragment : Fragment() {
         calendarView = view.findViewById(R.id.calendar_view)
         noEntryView = view.findViewById(R.id.no_entry)
         vNewEntry = view.findViewById(R.id.new_entry)
+
+        if (savedInstanceState != null)
+        {
+            chosenYear = savedInstanceState.getInt(KEY_YEAR)
+            chosenMonth = savedInstanceState.getInt(KEY_MONTH)
+            chosenDay = savedInstanceState.getInt(KEY_DAY)
+            calendarInstance.set(chosenYear, chosenMonth, chosenDay)
+
+            calendarView.date = calendarInstance.timeInMillis
+
+            updateJournalsList()
+        }
 
         journalRecyclerView.layoutManager = LinearLayoutManager(context)
         journalRecyclerView.adapter = adapter
@@ -81,7 +90,7 @@ class CalendarFragment : Fragment() {
     }
 
     private fun updateJournalsList() {
-        journalListViewModel.getAllJournalsByDate(chosenYear,chosenMonth, chosenDay).observe(
+        journalRepository.getJournalsByDate(chosenYear,chosenMonth, chosenDay).observe(
             viewLifecycleOwner,
             Observer { journals ->
                 journals?.let {
@@ -93,6 +102,13 @@ class CalendarFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         updateJournalsList()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(KEY_YEAR, chosenYear)
+        outState.putInt(KEY_MONTH, chosenMonth)
+        outState.putInt(KEY_DAY, chosenDay)
     }
 
     private fun showDetails(item : Journal)
