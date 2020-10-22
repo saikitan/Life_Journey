@@ -2,23 +2,33 @@ package au.edu.swin.sdmd.customprogram
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
+private const val KEY_QUERY = "au.edu.swin.sdmd.customprogram.searchquery"
+
 class SearchActivity : AppCompatActivity() {
 
     private lateinit var vSearch : SearchView
     private lateinit var vJournalList : RecyclerView
     private lateinit var vNoEntry : TextView
+    private var searchQuery = ""
     private var adapter = TheAdapter(emptyList()) {showDetails(it)}
     private val journalRepository = JournalRepository.get()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        if (savedInstanceState != null)
+        {
+            searchQuery = savedInstanceState.getString(KEY_QUERY) ?: ""
+            updateJournalsList(searchQuery)
+        }
 
         // Initialize views
         vSearch = findViewById(R.id.search)
@@ -36,6 +46,7 @@ class SearchActivity : AppCompatActivity() {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (query != null)
                 {
+                    searchQuery = query
                     updateJournalsList(query)
                 }
                 else
@@ -97,7 +108,10 @@ class SearchActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(KEY_QUERY, searchQuery)
+    }
 
 
 }
