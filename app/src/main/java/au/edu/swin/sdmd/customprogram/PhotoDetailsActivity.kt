@@ -23,6 +23,7 @@ class PhotoDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_photo_details)
 
+        // Initialize views
         vJournalImage = findViewById(R.id.image)
         vBackButton = findViewById(R.id.back_button)
         vDeleteButton = findViewById(R.id.delete_button)
@@ -35,6 +36,7 @@ class PhotoDetailsActivity : AppCompatActivity() {
             vDeleteButton.visibility = View.VISIBLE
         }
 
+        // Display the image
         if (journalImage.exists()) {
             val bitmap = getScaledBitmap(journalImage.path, this)
             vJournalImage.setImageBitmap(bitmap)
@@ -43,6 +45,7 @@ class PhotoDetailsActivity : AppCompatActivity() {
             vJournalImage.setImageDrawable(null)
         }
 
+        // Setup the listeners
         vDeleteButton.setOnClickListener {
             showDeleteAlert()
         }
@@ -52,6 +55,10 @@ class PhotoDetailsActivity : AppCompatActivity() {
         }
     }
 
+    /*
+        This function will create a delete confirmation box and perform
+        action according to the user response
+     */
     private fun showDeleteAlert (){
         MaterialAlertDialogBuilder(this)
             .setTitle(resources.getString(R.string.delete_title))

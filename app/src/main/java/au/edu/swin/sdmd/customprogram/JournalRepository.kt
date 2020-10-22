@@ -1,13 +1,10 @@
 package au.edu.swin.sdmd.customprogram
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.room.Room
 import au.edu.swin.sdmd.customprogram.database.JournalDatabase
 import java.io.File
-import java.lang.IllegalStateException
-import java.time.YearMonth
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -15,7 +12,7 @@ private const val DATABASE_NAME = "journal-database"
 
 class JournalRepository private constructor(context: Context){
 
-    // Room.databaseBuilder() creates a concrete implementation of abstract JournalDatabase
+    // Create Room Database
     private val database : JournalDatabase = Room.databaseBuilder(
         context.applicationContext,
         JournalDatabase::class.java,
@@ -23,13 +20,29 @@ class JournalRepository private constructor(context: Context){
     ).build()
 
     private val journalDao = database.journalDao()
-    private val executor = Executors.newSingleThreadExecutor()
+    private val executor = Executors.newSingleThreadExecutor()  // Create a background thread
     private val filesDir = context.applicationContext.filesDir
 
+    /*
+        This function retrieves all the journals in the database
+        Return: List of Journals
+     */
     fun getJournals() : LiveData<List<Journal>> = journalDao.getJournals()
 
+    /*
+        This function retrieves the journal with the UUID given
+        Parameter:  id - UUID of the journal
+        Return: Journal that match the uuid given
+     */
     fun getJournal(id: UUID): LiveData<Journal?> = journalDao.getJournal(id)
 
+    /*
+        This function retrieves all the journals within the date given
+        Parameter:  year - Year of the journal to be retrieve
+                    month - Month of the journal to be retrieve
+                    day - Day of the journal to be retrieve
+        Return: List of journals within the date given
+     */
     fun getJournalsByDate(year: Int, month : Int, day : Int) : LiveData<List<Journal>> {
         val calendarInstance = Calendar.getInstance()
         calendarInstance.set(year, month, day, 0, 0,0)
@@ -39,6 +52,12 @@ class JournalRepository private constructor(context: Context){
         return journalDao.getJournalsByDate(start, end)
     }
 
+    /*
+        This function retrieves all the journals within the month given
+        Parameter:  year - Year of the journal to be retrieve
+                    month - Month of the journal to be retrieve
+        Return: List of journals within the month given
+     */
     fun getJournalsByMonth(year: Int, month : Int) : LiveData<List<Journal>> {
         val calendarInstance = Calendar.getInstance()
         calendarInstance.set(year, month, 1, 0, 0,0)
@@ -48,26 +67,48 @@ class JournalRepository private constructor(context: Context){
         return journalDao.getJournalsByDate(start, end)
     }
 
+    /*
+        This function retrieves all the journal that contains the search string
+        Parameter:  searchString - query of the search
+        Return: List of journals contains the string
+     */
     fun getJournalsBySearch(searchString : String) : LiveData<List<Journal>> = journalDao.getJournalsBySearch("%${searchString}%")
 
+    /*
+        This function update the details of the journal
+        Parameter:  journal - journal to be update
+     */
     fun updateJournal (journal: Journal) {
         executor.execute {
             journalDao.updateJournal(journal)
         }
     }
 
+    /*
+        This function add a new journal
+        Parameter:  journal - journal to be add
+     */
     fun addJournal(journal: Journal) {
         executor.execute {
             journalDao.addJournal(journal)
         }
     }
 
+    /*
+        This function delete the journal given
+        Parameter:  journal - journal to be delete
+     */
     fun deleteJournal(journal: Journal) {
         executor.execute {
             journalDao.deleteJournal(journal)
         }
     }
 
+    /*
+        This function retrieve the photo file of the journal
+        Parameter:   journal - journal required
+        Return: Photo File of the journal
+     */
     fun getPhotoFile(journal: Journal) : File = File(filesDir, journal.photoFileName)
 
     companion object {

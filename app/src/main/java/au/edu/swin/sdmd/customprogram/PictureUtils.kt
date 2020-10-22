@@ -4,6 +4,12 @@ import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Point
+import kotlin.math.roundToInt
+import kotlin.math.roundToLong
+
+/*
+    Following code is created by refer to the BNR book
+ */
 
 fun getScaledBitmap(path: String, activity: Activity): Bitmap {
     val size = Point()
@@ -32,12 +38,12 @@ fun getScaledBitmap(path: String, destWidth: Int, destHeight: Int): Bitmap {
         } else {
             widthScale
         }
-        inSampleSize = Math.round(sampleScale)
+        inSampleSize = sampleScale.roundToInt()
     }
 
     options = BitmapFactory.Options()
     options.inSampleSize = inSampleSize
 
-    // Read in and create final bitmap
+    // Create final bitmap
     return BitmapFactory.decodeFile(path, options)
 }

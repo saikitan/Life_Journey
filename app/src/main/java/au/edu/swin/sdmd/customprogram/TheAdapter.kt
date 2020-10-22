@@ -40,7 +40,7 @@ class TheAdapter(private val data: List<Journal>,
 
         fun bind(item: Journal) {
             this.journal = item
-            var moodText: String
+            val moodText: String
 
             when (item.journalMood)
             {

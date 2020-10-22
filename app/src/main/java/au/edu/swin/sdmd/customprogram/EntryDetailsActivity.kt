@@ -73,26 +73,10 @@ class EntryDetailsActivity : AppCompatActivity() {
 
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
 
-        if (resultCode != Activity.RESULT_OK) return
-
-        if (requestCode == REQUEST_CODE) {
-            val journalReturn = data?.getParcelableExtra<Journal>(JOURNAL_KEY)
-
-            if (journalReturn != null) // Check whether journal is being deleted
-            {
-                updateJournal()
-            }
-            else {
-                finish()
-            }
-        }
-    }
 
     /*
-        This function will update all the UI Elements for the Journal (Date, Time, Mood, Content, Image)
+        This function will update all the UI elements for the Journal (Date, Time, Mood, Content, Image)
      */
     private fun updateUI() {
         // Update Date and Time
@@ -142,26 +126,6 @@ class EntryDetailsActivity : AppCompatActivity() {
         }
     }
 
-
-    /*
-        This function will create a delete confirmation dialog and perform action
-        according to the user response.
-     */
-    private fun showDeleteAlert (){
-            MaterialAlertDialogBuilder(this)
-                .setTitle(resources.getString(R.string.delete_title))
-                .setMessage(resources.getString(R.string.delete_supporting_text))
-                .setNeutralButton(resources.getString(R.string.cancel)) { _, _ ->
-                }
-                .setPositiveButton(resources.getString(R.string.delete)) { _, _ ->
-                    JournalRepository.get().deleteJournal(journal)
-                    journalImage.delete()
-                    finish()
-                }
-                .show()
-
-    }
-
     /*
         This function will retrieve the latest info about the journal
      */
@@ -179,9 +143,47 @@ class EntryDetailsActivity : AppCompatActivity() {
         )
     }
 
+    /*
+        This function will create a delete confirmation dialog and perform action
+        according to the user response.
+     */
+    private fun showDeleteAlert (){
+            MaterialAlertDialogBuilder(this)
+                .setTitle(resources.getString(R.string.delete_title))
+                .setMessage(resources.getString(R.string.delete_supporting_text))
+                .setNeutralButton(resources.getString(R.string.cancel)) { _, _ ->
+                }
+                .setPositiveButton(resources.getString(R.string.delete)) { _, _ ->
+                    journalRepository.deleteJournal(journal)
+                    journalImage.delete()
+                    finish()
+                }
+                .show()
+
+    }
+    
+
     override fun onStart() {
         super.onStart()
         updateJournal()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode != Activity.RESULT_OK) return
+
+        if (requestCode == REQUEST_CODE) {
+            val journalReturn = data?.getParcelableExtra<Journal>(JOURNAL_KEY)
+
+            if (journalReturn != null) // Check whether journal is being deleted
+            {
+                updateJournal()
+            }
+            else {
+                finish()
+            }
+        }
     }
 
     companion object{

@@ -1,19 +1,15 @@
 package au.edu.swin.sdmd.customprogram
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CalendarView
 import android.widget.TextView
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.lifecycle.Observer
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.android.synthetic.main.activity_entry_details.*
 import java.util.*
 
 private const val KEY_YEAR = "au.edu.swin.sdmd.customprogram.year"
@@ -22,9 +18,9 @@ private const val KEY_DAY = "au.edu.swin.sdmd.customprogram.day"
 
 class CalendarFragment : Fragment() {
 
-    private lateinit var journalRecyclerView : RecyclerView
-    private lateinit var calendarView : CalendarView
-    private lateinit var noEntryView : TextView
+    private lateinit var vJournalList : RecyclerView
+    private lateinit var vCalendar : CalendarView
+    private lateinit var vNoEntry : TextView
     private lateinit var vNewEntry : FloatingActionButton
     private var adapter = TheAdapter(emptyList()) {showDetails(it)}
     private val calendarInstance = Calendar.getInstance()
@@ -39,9 +35,11 @@ class CalendarFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view =  inflater.inflate(R.layout.fragment_calendar, container, false)
-        journalRecyclerView = view.findViewById(R.id.entries_list)
-        calendarView = view.findViewById(R.id.calendar_view)
-        noEntryView = view.findViewById(R.id.no_entry)
+
+        // Initialize View
+        vJournalList = view.findViewById(R.id.entries_list)
+        vCalendar = view.findViewById(R.id.calendar_view)
+        vNoEntry = view.findViewById(R.id.no_entry)
         vNewEntry = view.findViewById(R.id.new_entry)
 
         if (savedInstanceState != null)
@@ -49,17 +47,20 @@ class CalendarFragment : Fragment() {
             chosenYear = savedInstanceState.getInt(KEY_YEAR)
             chosenMonth = savedInstanceState.getInt(KEY_MONTH)
             chosenDay = savedInstanceState.getInt(KEY_DAY)
-            calendarInstance.set(chosenYear, chosenMonth, chosenDay)
 
-            calendarView.date = calendarInstance.timeInMillis
+            // Set the calender view to selected date
+            calendarInstance.set(chosenYear, chosenMonth, chosenDay)
+            vCalendar.date = calendarInstance.timeInMillis
 
             updateJournalsList()
         }
 
-        journalRecyclerView.layoutManager = LinearLayoutManager(context)
-        journalRecyclerView.adapter = adapter
-        
-        calendarView.setOnDateChangeListener { _, year, month, day ->
+        // Initialize Recycler View
+        vJournalList.layoutManager = LinearLayoutManager(context)
+        vJournalList.adapter = adapter
+
+        // Setup Listener
+        vCalendar.setOnDateChangeListener { _, year, month, day ->
             chosenYear = year
             chosenMonth = month
             chosenDay = day
@@ -74,29 +75,46 @@ class CalendarFragment : Fragment() {
         return view
     }
 
+    /*
+        This function update the UI that shows the journal lists
+        Parameter:  journals - A list contains journals
+     */
     private fun updateUI(journals: List<Journal>) {
         adapter = TheAdapter(journals) {showDetails(it)}
 
         if (adapter.itemCount == 0)
         {
-            noEntryView.visibility = View.VISIBLE
+            vNoEntry.visibility = View.VISIBLE
         }
         else
         {
-            noEntryView.visibility = View.INVISIBLE
+            vNoEntry.visibility = View.INVISIBLE
         }
 
-        journalRecyclerView.adapter = adapter
+        vJournalList.adapter = adapter
     }
 
+    /*
+        This function retrieves the journals of chosen date and update the UI
+     */
     private fun updateJournalsList() {
         journalRepository.getJournalsByDate(chosenYear,chosenMonth, chosenDay).observe(
             viewLifecycleOwner,
-            Observer { journals ->
+            { journals ->
                 journals?.let {
                     updateUI(journals)
                 }
             })
+    }
+
+    /*
+        This function will start the another activity that show the details of the journal
+        Parameter:  item - Journal to be shown
+     */
+    private fun showDetails(item : Journal)
+    {
+        val intent = EntryDetailsActivity.newIntent(activity, item.id.toString())
+        startActivity(intent)
     }
 
     override fun onStart() {
@@ -111,10 +129,6 @@ class CalendarFragment : Fragment() {
         outState.putInt(KEY_DAY, chosenDay)
     }
 
-    private fun showDetails(item : Journal)
-    {
-        val intent = EntryDetailsActivity.newIntent(activity, item.id.toString())
-        startActivity(intent)
-    }
+
 
 }

@@ -30,5 +30,4 @@
     <string name="empty_input_error">Enter some text!</string>
     <string name="month_mood">Mood of the Month:</string>
     <string name="camera">Camera</string>
-    <string name="gallery">Gallery</string>
 </resources>

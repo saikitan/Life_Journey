@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.lifecycle.Observer
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -24,10 +23,10 @@ class MoodFragment : Fragment() {
 
     private lateinit var vPreviousButton : ImageButton
     private lateinit var vNextButton : ImageButton
-    private lateinit var vMonthText : TextView
+    private lateinit var vMonth : TextView
     private lateinit var vMoodChart: PieChart
     private lateinit var vMoodIcon : ImageView
-    private lateinit var vMonthMoodText : TextView
+    private lateinit var vMonthMood : TextView
     private lateinit var vNoEntry : TextView
     private lateinit var vNewEntry : FloatingActionButton
     private var chosenYear = Calendar.getInstance().get(Calendar.YEAR)
@@ -52,10 +51,10 @@ class MoodFragment : Fragment() {
         // Initialize views
         vPreviousButton = view.findViewById(R.id.previous_button)
         vNextButton = view.findViewById(R.id.next_button)
-        vMonthText = view.findViewById(R.id.month_text)
+        vMonth = view.findViewById(R.id.month_text)
         vMoodChart = view.findViewById(R.id.mood_chart)
         vMoodIcon = view.findViewById(R.id.mood_icon)
-        vMonthMoodText = view.findViewById(R.id.month_mood_text)
+        vMonthMood = view.findViewById(R.id.month_mood_text)
         vNoEntry = view.findViewById(R.id.no_entry)
         vNewEntry = view.findViewById(R.id.new_entry)
 
@@ -65,7 +64,7 @@ class MoodFragment : Fragment() {
             chosenMonth = savedInstanceState.getInt(KEY_MONTH)
         }
 
-        updateData()
+        updateJournalList()
 
         // Setting up the chart characteristic
         vMoodChart.legend.isEnabled = false
@@ -77,12 +76,12 @@ class MoodFragment : Fragment() {
         // Setup listeners
         vPreviousButton.setOnClickListener {
             previousMonth()
-            updateData()
+            updateJournalList()
         }
 
         vNextButton.setOnClickListener {
             nextMonth()
-            updateData()
+            updateJournalList()
         }
 
         vNewEntry.setOnClickListener {
@@ -94,7 +93,7 @@ class MoodFragment : Fragment() {
     }
 
     /*
-        This function will set the current month to the month before
+        This function will set the chosen month to the month before
      */
     private fun previousMonth()
     {
@@ -110,7 +109,7 @@ class MoodFragment : Fragment() {
     }
 
     /*
-        This function will set the current month to the month after
+        This function will set the chosen month to the month after
      */
     private fun nextMonth()
     {
@@ -125,6 +124,10 @@ class MoodFragment : Fragment() {
         }
     }
 
+    /*
+        This function will update all the UI elements
+        Parameter:  journals - List of journals to be put in the mood chart
+     */
     private fun updateUI(journals: List<Journal>) {
         val monthText = "${monthName[chosenMonth]} $chosenYear"
         val moodFrequency = arrayOf(0,0,0,0,0)
@@ -133,16 +136,17 @@ class MoodFragment : Fragment() {
         val pieData = PieData(dataSet)
         val maxIndex: Int
 
-        vMonthText.text = monthText
+        vMonth.text = monthText
 
         if (journals.isNotEmpty())
         {
+            // Calculate the number of entries for each mood
             for (journal in journals)
             {
                 moodFrequency[5 - journal.journalMood]++
             }
 
-
+            // Update the data of the chart
             if (moodFrequency[0] != 0)
             {
                 entries.add(PieEntry(moodFrequency[0].toFloat(), getString(R.string.very_good_mood)))
@@ -168,6 +172,7 @@ class MoodFragment : Fragment() {
                 entries.add(PieEntry(moodFrequency[4].toFloat(), getString(R.string.very_bad_mood)))
             }
 
+            // Setting up the chart data characteristics
             dataSet.colors = dataColorArray
             pieData.setValueTextSize(12f)
             pieData.setValueTextColor(Color.WHITE)
@@ -175,8 +180,9 @@ class MoodFragment : Fragment() {
             vMoodChart.data = pieData
             vNoEntry.visibility = View.INVISIBLE
             vMoodIcon.visibility = View.VISIBLE
-            vMonthMoodText.visibility = View.VISIBLE
+            vMonthMood.visibility = View.VISIBLE
 
+            // Find which mood has the highest frequency
             maxIndex = moodFrequency.indexOf(moodFrequency.maxOrNull())
 
             when (maxIndex)
@@ -200,18 +206,22 @@ class MoodFragment : Fragment() {
             vMoodChart.data = null
             vNoEntry.visibility = View.VISIBLE
             vMoodIcon.visibility = View.INVISIBLE
-            vMonthMoodText.visibility = View.INVISIBLE
+            vMonthMood.visibility = View.INVISIBLE
         }
 
+        // Update the chart and show it in the view
         vMoodChart.invalidate()
 
     }
 
-
-    private fun updateData() {
+    /*
+        This function will retrieve the list of journals according to the month selected
+        and update the UI
+     */
+    private fun updateJournalList() {
         journalRepository.getJournalsByMonth(chosenYear, chosenMonth).observe(
             viewLifecycleOwner,
-            Observer { journals ->
+            { journals ->
                 journals?.let {
                     updateUI(journals)
                 }
@@ -226,7 +236,7 @@ class MoodFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        updateData()
+        updateJournalList()
         Log.d("AAA", "Onstart $chosenMonth")
 
     }
