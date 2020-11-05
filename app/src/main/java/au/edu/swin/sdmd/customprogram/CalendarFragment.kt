@@ -14,9 +14,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
 
-private const val KEY_YEAR = "au.edu.swin.sdmd.customprogram.year"
-private const val KEY_MONTH = "au.edu.swin.sdmd.customprogram.month"
-private const val KEY_DAY = "au.edu.swin.sdmd.customprogram.day"
+private const val KEY_YEAR = "au.edu.swin.sdmd.customprogram.calendarfragment.year"
+private const val KEY_MONTH = "au.edu.swin.sdmd.customprogram.calendarfragment.month"
+private const val KEY_DAY = "au.edu.swin.sdmd.customprogram.calendarfragment.day"
 
 class CalendarFragment : Fragment() {
 

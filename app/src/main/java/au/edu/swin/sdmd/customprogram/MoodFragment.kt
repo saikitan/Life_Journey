@@ -17,8 +17,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
 import kotlin.collections.ArrayList
 
-private const val KEY_YEAR = "au.edu.swin.sdmd.customprogram.year"
-private const val KEY_MONTH = "au.edu.swin.sdmd.customprogram.month"
+private const val KEY_YEAR = "au.edu.swin.sdmd.customprogram.moodfragment.year"
+private const val KEY_MONTH = "au.edu.swin.sdmd.customprogram.moodfagment.month"
 
 class MoodFragment : Fragment() {
 
