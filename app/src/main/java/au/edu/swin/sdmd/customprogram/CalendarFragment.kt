@@ -1,12 +1,14 @@
 package au.edu.swin.sdmd.customprogram
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CalendarView
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -27,7 +29,10 @@ class CalendarFragment : Fragment() {
     private var chosenDay: Int = calendarInstance.get(Calendar.DAY_OF_MONTH)
     private var chosenMonth: Int = calendarInstance.get(Calendar.MONTH)
     private var chosenYear: Int = calendarInstance.get(Calendar.YEAR)
-    private val journalRepository = JournalRepository.get()
+
+    private val journalListViewModel: JournalListViewModel by lazy {
+        ViewModelProvider(this).get(JournalListViewModel::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -98,7 +103,7 @@ class CalendarFragment : Fragment() {
         This function retrieves the journals of chosen date and update the UI
      */
     private fun updateJournalsList() {
-        journalRepository.getJournalsByDate(chosenYear,chosenMonth, chosenDay).observe(
+        journalListViewModel.getAllJournalsByDate(chosenYear,chosenMonth, chosenDay).observe(
             viewLifecycleOwner,
             { journals ->
                 journals?.let {
@@ -119,6 +124,11 @@ class CalendarFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+
+        // Set the calender view to selected date
+        calendarInstance.set(chosenYear, chosenMonth, chosenDay)
+        vCalendar.date = calendarInstance.timeInMillis
+
         updateJournalsList()
     }
 

@@ -17,6 +17,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.core.content.FileProvider
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.File
 import java.text.DateFormat
@@ -42,9 +43,12 @@ class EntryInputActivity : AppCompatActivity() {
     private lateinit var formattedDate : String
     private lateinit var formattedTime: String
     private lateinit var photoUri : Uri
-    private var journalRepository = JournalRepository.get()
     private var editJournal = false                         // Use to store whether it is in journal edit mode
     private val calendarInstance = Calendar.getInstance()
+
+    private val journalDetailsViewModel: JournalDetailsViewModel by lazy {
+        ViewModelProvider(this).get(JournalDetailsViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +69,7 @@ class EntryInputActivity : AppCompatActivity() {
         vEntryImage = findViewById(R.id.image)
 
         // Get the photo file of the journal
-        journalImage = journalRepository.getPhotoFile(journal)
+        journalImage = journalDetailsViewModel.getPhotoFile(journal)
 
         // Get the URI of the file
         photoUri = FileProvider.getUriForFile(this, "au.edu.swin.sdmd.customprogram.fileprovider", journalImage)
@@ -185,12 +189,12 @@ class EntryInputActivity : AppCompatActivity() {
                         putExtra(JOURNAL_KEY, journal)
                     }
 
-                    journalRepository.updateJournal(journal)
+                    journalDetailsViewModel.updateJournal(journal)
                     setResult(Activity.RESULT_OK, i)
                 }
                 else
                 {
-                    journalRepository.addJournal(journal)
+                    journalDetailsViewModel.addJournal(journal)
                 }
 
                 finish()
@@ -287,7 +291,7 @@ class EntryInputActivity : AppCompatActivity() {
             .setNeutralButton(resources.getString(R.string.cancel)) { _, _ ->
             }
             .setPositiveButton(resources.getString(R.string.delete)) { _, _ ->
-                journalRepository.deleteJournal(journal)
+                journalDetailsViewModel.deleteJournal(journal)
                 journalImage.delete()
                 setResult(Activity.RESULT_OK)
                 finish()

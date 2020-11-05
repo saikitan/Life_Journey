@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -31,7 +32,6 @@ class MoodFragment : Fragment() {
     private lateinit var vNewEntry : FloatingActionButton
     private var chosenYear = Calendar.getInstance().get(Calendar.YEAR)
     private var chosenMonth = Calendar.getInstance().get(Calendar.MONTH)
-    private val journalRepository = JournalRepository.get()
     private val monthName = arrayOf("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
     private val dataColorArray = mutableListOf(
         Color.argb(255, 119, 172, 223),
@@ -40,6 +40,9 @@ class MoodFragment : Fragment() {
         Color.argb(255, 189, 225, 97),
         Color.argb(255, 198, 86, 170))
 
+    private val journalListViewModel: JournalListViewModel by lazy {
+        ViewModelProvider(this).get(JournalListViewModel::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -219,7 +222,7 @@ class MoodFragment : Fragment() {
         and update the UI
      */
     private fun updateJournalList() {
-        journalRepository.getJournalsByMonth(chosenYear, chosenMonth).observe(
+        journalListViewModel.getAllJournalsByMonth(chosenYear, chosenMonth).observe(
             viewLifecycleOwner,
             { journals ->
                 journals?.let {
@@ -237,7 +240,7 @@ class MoodFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         updateJournalList()
-        Log.d("AAA", "Onstart $chosenMonth")
+        Log.d("MoodFragment", "onStart, Month: ${chosenMonth + 1}")
 
     }
 

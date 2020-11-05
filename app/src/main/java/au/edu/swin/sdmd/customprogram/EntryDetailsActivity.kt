@@ -10,6 +10,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.File
 import java.text.DateFormat
@@ -31,7 +32,10 @@ class EntryDetailsActivity : AppCompatActivity() {
     private lateinit var vEntryImage : ImageView
     private lateinit var journalImage : File
     private lateinit var journal: Journal
-    private val journalRepository = JournalRepository.get()
+
+    private val journalDetailsViewModel: JournalDetailsViewModel by lazy {
+        ViewModelProvider(this).get(JournalDetailsViewModel::class.java)
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,8 +76,6 @@ class EntryDetailsActivity : AppCompatActivity() {
         }
 
     }
-
-
 
     /*
         This function will update all the UI elements for the Journal (Date, Time, Mood, Content, Image)
@@ -131,12 +133,12 @@ class EntryDetailsActivity : AppCompatActivity() {
      */
     private fun updateJournal()
     {
-        journalRepository.getJournal(UUID.fromString(intent.getStringExtra(JOURNAL_KEY))).observe(
+        journalDetailsViewModel.getJournal(UUID.fromString(intent.getStringExtra(JOURNAL_KEY))).observe(
             this,
             { journalFound ->
                 journalFound?.let {
                     journal = journalFound
-                    journalImage = journalRepository.getPhotoFile(journal)
+                    journalImage = journalDetailsViewModel.getPhotoFile(journal)
                     updateUI()
                 }
             }
@@ -154,7 +156,7 @@ class EntryDetailsActivity : AppCompatActivity() {
                 .setNeutralButton(resources.getString(R.string.cancel)) { _, _ ->
                 }
                 .setPositiveButton(resources.getString(R.string.delete)) { _, _ ->
-                    journalRepository.deleteJournal(journal)
+                    journalDetailsViewModel.deleteJournal(journal)
                     journalImage.delete()
                     finish()
                 }

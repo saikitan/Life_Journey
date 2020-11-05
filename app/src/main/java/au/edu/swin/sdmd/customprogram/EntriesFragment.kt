@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -16,8 +17,10 @@ class EntriesFragment : Fragment() {
     private lateinit var vNoEntry : TextView
     private lateinit var vNewEntry : FloatingActionButton
     private var adapter = TheAdapter(emptyList()) {showDetails(it)}
-    private val journalRepository = JournalRepository.get()
 
+    private val journalListViewModel: JournalListViewModel by lazy {
+        ViewModelProvider(this).get(JournalListViewModel::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,7 +70,7 @@ class EntriesFragment : Fragment() {
         This function retrieves all the journals from the database and update the UI
      */
     private fun updateJournalsList() {
-        journalRepository.getJournals().observe(
+        journalListViewModel.getAllJournals().observe(
             viewLifecycleOwner,
             { journals ->
                 journals?.let {

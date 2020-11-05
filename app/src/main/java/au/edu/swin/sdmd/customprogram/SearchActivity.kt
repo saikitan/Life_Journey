@@ -6,6 +6,7 @@ import android.os.PersistableBundle
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -18,7 +19,10 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var vNoEntry : TextView
     private var searchQuery = ""
     private var adapter = TheAdapter(emptyList()) {showDetails(it)}
-    private val journalRepository = JournalRepository.get()
+
+    private val journalListViewModel: JournalListViewModel by lazy {
+        ViewModelProvider(this).get(JournalListViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,7 +92,7 @@ class SearchActivity : AppCompatActivity() {
         Parameter:  searchString - Query that user entered for search
      */
     fun updateJournalsList(searchString : String) {
-        journalRepository.getJournalsBySearch(searchString).observe(
+        journalListViewModel.getAllJournalsBySearch(searchString).observe(
             this,
             { journals ->
                 journals?.let {
