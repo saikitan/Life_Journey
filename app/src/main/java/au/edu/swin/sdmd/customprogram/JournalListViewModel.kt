@@ -2,7 +2,6 @@ package au.edu.swin.sdmd.customprogram
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import java.io.File
 
 class JournalListViewModel : ViewModel() {
 

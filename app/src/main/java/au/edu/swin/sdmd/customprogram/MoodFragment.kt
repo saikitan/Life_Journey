@@ -67,7 +67,7 @@ class MoodFragment : Fragment() {
             chosenMonth = savedInstanceState.getInt(KEY_MONTH)
         }
 
-        updateJournalList()
+        updateJournalsList()
 
         // Setting up the chart characteristic
         vMoodChart.legend.isEnabled = false
@@ -79,12 +79,12 @@ class MoodFragment : Fragment() {
         // Setup listeners
         vPreviousButton.setOnClickListener {
             previousMonth()
-            updateJournalList()
+            updateJournalsList()
         }
 
         vNextButton.setOnClickListener {
             nextMonth()
-            updateJournalList()
+            updateJournalsList()
         }
 
         vNewEntry.setOnClickListener {
@@ -221,7 +221,7 @@ class MoodFragment : Fragment() {
         This function will retrieve the list of journals according to the month selected
         and update the UI
      */
-    private fun updateJournalList() {
+    private fun updateJournalsList() {
         journalListViewModel.getAllJournalsByMonth(chosenYear, chosenMonth).observe(
             viewLifecycleOwner,
             { journals ->
@@ -239,7 +239,7 @@ class MoodFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        updateJournalList()
+        updateJournalsList()
         Log.d("MoodFragment", "onStart, Month: ${chosenMonth + 1}")
 
     }
