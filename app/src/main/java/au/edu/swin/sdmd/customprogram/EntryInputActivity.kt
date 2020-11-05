@@ -12,10 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.ImageView
+import android.widget.*
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -191,10 +188,12 @@ class EntryInputActivity : AppCompatActivity() {
 
                     journalDetailsViewModel.updateJournal(journal)
                     setResult(Activity.RESULT_OK, i)
+                    Toast.makeText(this, getString(R.string.journal_updated), Toast.LENGTH_SHORT).show()
                 }
                 else
                 {
                     journalDetailsViewModel.addJournal(journal)
+                    Toast.makeText(this, getString(R.string.journal_added), Toast.LENGTH_SHORT).show()
                 }
 
                 finish()
@@ -294,6 +293,7 @@ class EntryInputActivity : AppCompatActivity() {
                 journalDetailsViewModel.deleteJournal(journal)
                 journalImage.delete()
                 setResult(Activity.RESULT_OK)
+                Toast.makeText(this, getString(R.string.journal_deleted), Toast.LENGTH_SHORT).show()
                 finish()
             }
             .show()

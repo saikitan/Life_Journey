@@ -30,4 +30,7 @@
     <string name="empty_input_error">Enter some text!</string>
     <string name="month_mood">Mood of the Month:</string>
     <string name="camera">Camera</string>
+    <string name="journal_updated">Changes Saved!</string>
+    <string name="journal_added">Journal Added!</string>
+    <string name="journal_deleted">Journal Deleted!</string>
 </resources>

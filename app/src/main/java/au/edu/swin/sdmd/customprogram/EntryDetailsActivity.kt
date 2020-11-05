@@ -9,6 +9,7 @@ import android.text.method.ScrollingMovementMethod
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -158,6 +159,7 @@ class EntryDetailsActivity : AppCompatActivity() {
                 .setPositiveButton(resources.getString(R.string.delete)) { _, _ ->
                     journalDetailsViewModel.deleteJournal(journal)
                     journalImage.delete()
+                    Toast.makeText(this, getString(R.string.journal_deleted), Toast.LENGTH_SHORT).show()
                     finish()
                 }
                 .show()
